@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+  haproxy:
+    container_name: ${HAPROXY_NAME}
+    restart: always
+    image: haproxy:latest
+    ports:
+      - "127.0.0.1:${HAPROXY_PORT}:80"
+      - "127.0.0.1:${HAPROXY_STATS_PORT}:9000"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
