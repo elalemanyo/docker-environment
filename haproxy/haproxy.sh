@@ -1,7 +1,22 @@
 #!/bin/bash
 low-add-backend() {
   for name in "${@:2}"; do
-    awk -v name="$name" '{ if ($0 == "backend " name ) { exists=1; exit 1; } } END { if (exists == 1) print "Backend " name " already exists." > "/dev/stderr"; else { print "backend " name "\n  server " name " " name "-web:80 check resolvers docker resolve-prefer ipv4\n"; exit 0; } }' < "$1" >> "$1"
+    awk -v name="$name" '
+    {
+      if ($0 == "backend " name ) {
+        exists=1;
+        exit 1;
+      }
+    }
+    END {
+      if (exists == 1) print "Backend " name " already exists." > "/dev/stderr";
+      else {
+        print "backend " name "\n  server " name " " name "-web:80 check resolvers docker resolve-prefer ipv4\n";
+        exit 0;
+      }
+    }
+    ' "$1" > "$1.bak"
+    cp "$1.bak" "$1"
   done
 }
 
