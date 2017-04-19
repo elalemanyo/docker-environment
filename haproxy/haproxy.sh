@@ -7,8 +7,8 @@ low-add-backend() {
 
 low-remove-backend() {
   for name in "${@:2}"; do
-    sed -e "/^backend $name$/d" -e "/^  server $name $name-web:80 check resolvers docker resolve-prefer ipv4/,+1d" "$1" > "$1.tmp"
-    mv "$1.tmp" "$1"
+    sed -e "/^backend $name$/d" -e "/^  server $name $name-web:80 check resolvers docker resolve-prefer ipv4/,+1d" "$1" > "$1.bak"
+    cp "$1.bak" "$1"
   done
 }
 
@@ -21,8 +21,8 @@ low-list-projects() {
 }
 
 low-reset-backends() {
-  sed '/#####/q' "$1" > "$1.tmp"
-  mv "$1.tmp" "$1"
+  sed '/#####/q' "$1" > "$1.bak"
+  cp "$1.bak" "$1"
   echo "" >> "$1"
   low-add-backend "$1" $(low-list-projects "$2")
 }
