@@ -1,5 +1,5 @@
 #!/bin/bash
-low-add-backend() {
+_add-backend() {
   for name in "${@:2}"; do
     awk -v name="$name" '
     {
@@ -15,31 +15,34 @@ low-add-backend() {
         exit 0;
       }
     }
-    ' "$1" > "$1.bak"
-    cp "$1.bak" "$1"
+    ' < "$1" >> "$1"
   done
 }
 
-low-remove-backend() {
+_remove-backend() {
   for name in "${@:2}"; do
     sed -e "/^backend $name$/d" -e "/^  server $name $name-web:80 check resolvers docker resolve-prefer ipv4/,+1d" "$1" > "$1.bak"
     cp "$1.bak" "$1"
   done
 }
 
-low-list-backend() {
+_list-backends() {
   grep -o '^backend .*' "$1" | cut -d ' ' -f 2 | sort
 }
 
-low-list-projects() {
+_list-projects() {
   find "$1" -maxdepth 3 -type d -name '.git' -exec dirname {} \; | xargs basename -a | sort
 }
 
-low-reset-backends() {
+_reset-backends() {
   sed '/#####/q' "$1" > "$1.bak"
   cp "$1.bak" "$1"
   echo "" >> "$1"
-  low-add-backend "$1" $(low-list-projects "$2")
+  _add-backend "$1" $(_list-projects "$2")
+}
+
+_update-backends() {
+  _add-backend "$1" $(_list-projects "$2") 2>/dev/null
 }
 
 check_env() {
@@ -57,27 +60,32 @@ check_env() {
 
 add-backend() {
   check_env > /dev/null
-  low-add-backend "$CONFIG_FILE" "$@"
+  _add-backend "$CONFIG_FILE" "$@"
 }
 
-remove-backend() {
+list-backends() {
   check_env > /dev/null
-  low-remove-backend "$CONFIG_FILE" "$@"
-}
-
-list-backend() {
-  check_env > /dev/null
-  low-list-backend "$CONFIG_FILE" | column -x
+  _list-backends "$CONFIG_FILE" | column -x
 }
 
 list-projects() {
   check_env > /dev/null
-  low-list-projects "$PROJECTS_DIR" | column -x
+  _list-projects "$PROJECTS_DIR" | column -x
+}
+
+remove-backend() {
+  check_env > /dev/null
+  _remove-backend "$CONFIG_FILE" "$@"
 }
 
 reset-backends() {
   check_env > /dev/null
-  low-reset-backends "$CONFIG_FILE" "$PROJECTS_DIR"
+  _reset-backends "$CONFIG_FILE" "$PROJECTS_DIR"
+}
+
+update-backends() {
+  check_env > /dev/null
+  _update-backends "$CONFIG_FILE" "$PROJECTS_DIR"
 }
 
 _backend() {
@@ -85,12 +93,12 @@ _backend() {
   COMPREPLY=()
   opts=""
   cur="${COMP_WORDS[COMP_CWORD]}"
-  backends=$(low-list-backend "$CONFIG_FILE")
+  backends=$(_list-backends "$CONFIG_FILE")
   if [ "$1" == add-backend ]; then
     if [ -z "$backends" ]; then
-      opts="$(low-list-projects "$PROJECTS_DIR")"
+      opts="$(_list-projects "$PROJECTS_DIR")"
     else
-      opts=$(grep -vxf <(echo "$backends") <(low-list-projects "$PROJECTS_DIR") | sort -u)
+      opts=$(grep -vxf <(echo "$backends") <(_list-projects "$PROJECTS_DIR") | sort -u)
     fi
   elif [[ "$1" == remove-backend ]]; then
     opts="$backends"
