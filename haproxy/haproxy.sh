@@ -31,7 +31,8 @@ _list-backends() {
 }
 
 _list-projects() {
-  find "$1" -maxdepth 3 -type d -name '.git' -exec dirname {} \; | xargs basename -a | sort
+  sort -u <(find "$1" -maxdepth 3 -type d -name '.git' -exec dirname {} \; | xargs basename -a)\
+     <(docker ps --format "{{.Names}}" --filter "name=web" | sed 's/-web.*//')
 }
 
 _reset-backends() {
