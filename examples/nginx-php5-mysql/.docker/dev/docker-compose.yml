@@ -34,8 +34,8 @@ services:
       MYSQL_PASS: ${MYSQL_PASS}
     volumes:
       - ./mysql/data/:/var/lib/mysql
-    ports:
-      - "3306:3306"
+    # ports:
+    #   - "3306:3306"
 
 networks:
   default:
