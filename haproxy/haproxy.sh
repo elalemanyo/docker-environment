@@ -21,7 +21,7 @@ _add-backend() {
 
 _remove-backend() {
   for name in "${@:2}"; do
-    sed -e "/^backend $name$/d" -e "/^  server $name $name-web:80 check resolvers docker resolve-prefer ipv4/,+1d" "$1" > "$1.bak"
+    sed -e "/^backend $name$/d" -e "/^  server $name $name-web:80 check resolvers docker resolve-prefer ipv4$/N; /^  server $name $name-web:80 check resolvers docker resolve-prefer ipv4/d" "$1" > "$1.bak"
     cp "$1.bak" "$1"
   done
 }
