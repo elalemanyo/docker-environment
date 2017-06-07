@@ -1,2 +1,4 @@
 haproxy/.env
 haproxy/haproxy.cfg
+
+.idea
