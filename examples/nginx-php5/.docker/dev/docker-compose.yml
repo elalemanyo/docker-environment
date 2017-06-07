@@ -1,0 +1,29 @@
+version: '2'
+
+services:
+  web:
+    container_name: ${PROJECT_NAME}-web
+    restart: always
+    image: nginx:latest
+    links:
+      - phpfpm:phpfpm
+    volumes:
+      - ./nginx/vhost.conf:/etc/nginx/conf.d/default.conf
+      - ./log/nginx:/var/log/nginx
+      - ../../:/var/www/html
+
+  phpfpm:
+    container_name: ${PROJECT_NAME}-phpfpm
+    restart: always
+    image: php:5.6.30-fpm
+    build: ./php-fpm-5.6
+    volumes:
+      - ./php-fpm-5.6/php-fpm.conf:/usr/local/etc/php-fpm.conf
+      - ./php-fpm-5.6/php.ini:/usr/local/etc/php/php.ini
+      - ./log/php-fpm:/var/log/php-fpm
+      - ../../:/var/www/html
+
+networks:
+  default:
+    external:
+      name: haproxy_default
