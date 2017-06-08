@@ -1,4 +1,6 @@
 haproxy/.env
 haproxy/haproxy.cfg
 
+portainer/data
+
 .idea
