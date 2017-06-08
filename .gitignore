@@ -1,5 +1,6 @@
 haproxy/.env
 haproxy/haproxy.cfg
+haproxy/haproxy.cfg.bak
 
 portainer/data
 
