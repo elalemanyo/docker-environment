@@ -1,10 +1,11 @@
 version: "2"
 services:
   portainer:
+    container_name: ${PORTAINER_NAME}
     image: portainer/portainer
     command: --no-auth
     volumes:
       - ./data:/data
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - 8080:9000
+      - "127.0.0.1:${PORTAINER_PORT}:9000"
