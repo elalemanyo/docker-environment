@@ -3,6 +3,6 @@ haproxy/haproxy.cfg
 haproxy/haproxy.cfg.bak
 
 portainer/data
-haproxy/.env
+portainer/.env
 
 .idea
